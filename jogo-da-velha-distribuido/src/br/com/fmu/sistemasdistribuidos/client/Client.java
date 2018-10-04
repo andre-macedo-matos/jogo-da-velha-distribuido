@@ -6,28 +6,47 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class Client {
+import br.com.fmu.sistemasdistribuidos.room.GameRoom;
 
+public class Client {
+	
+	private String hostIP;
+	private int port;
+	
+	public Client(String hostIP, int port) {
+		this.hostIP = hostIP;
+		this.port = port;
+	}
+	
+	public void connect() throws UnknownHostException, IOException {
+		Socket client = new Socket(this.hostIP, this.port);
+		System.out.println("Conectando...");
+		
+		GameRoom room = new GameRoom(client.getInputStream());
+		new Thread(room).start();
+		
+		Scanner scanner = new Scanner(System.in);
+		PrintStream out = new PrintStream(client.getOutputStream());
+		
+		while(scanner.hasNextLine()) {
+			out.println("client " + client.getInetAddress().getHostAddress() + ": " + scanner.nextLine());
+		}
+		
+		out.close();
+		scanner.close();
+		client.close();
+	}
+	
 	public static void main(String[] args) {
 		try {
-			Socket client = new Socket("127.0.0.1", 12345);
-			System.out.println("Conectando ao servidor...");
-			
-			Scanner scanner = new Scanner(System.in);
-			PrintStream out = new PrintStream(client.getOutputStream());
-			
-			while (scanner.hasNextLine()) {
-				out.println(scanner.nextLine());
-			}
-			
-			out.close();
-			scanner.close();
-			client.close();
-			
+			new Client("127.0.0.1", 12345).connect();
+				
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	
 }

@@ -1,33 +1,54 @@
 package br.com.fmu.sistemasdistribuidos.server;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
+
+import br.com.fmu.sistemasdistribuidos.room.MessagesCaster;
 
 public class Server {
 	
-	public static void main(String[] args) {
+	private int port;
+	private List<PrintStream> clients;
+	
+	public Server(int port) {
+		this.port = port;
+		this.clients = new ArrayList<PrintStream>();
+	}
+	
+	public void execute() throws IOException {
+		ServerSocket server = new ServerSocket(this.port);
+		System.out.println("Servidor online!!!");
 		
-		try {
-			ServerSocket server = new ServerSocket(12345);
-			System.out.println("Servidor rodando na porta 12345...");
-			
+		while (true) {
 			Socket client = server.accept();
-			System.out.println("Nova connexão com " + client.getInetAddress().getHostAddress());
+			System.out.println("Novo usuario conectado: " + client.getLocalPort());
 			
-			Scanner scanner = new Scanner(client.getInputStream());
-			while (scanner.hasNextLine()) {
-				System.out.println(scanner.nextLine());
-			}
+			PrintStream clientInput = new PrintStream(client.getOutputStream());
+			this.clients.add(clientInput);
 			
-			scanner.close();
-			client.close();
-			server.close();
+			MessagesCaster messagesCast = new MessagesCaster(client.getInputStream(), this);
+			new Thread(messagesCast).start();
+		}
+	}
+
+	public void castMessages(String message) {
+		for (PrintStream client : clients) {
+			client.println(message);
+		}
+	}
+	
+	
+	public static void main(String[] args) {
+		try {
+			new Server(12345).execute();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 }
