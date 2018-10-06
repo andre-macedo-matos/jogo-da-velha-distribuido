@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-import br.com.fmu.sistemasdistribuidos.room.GameRoom;
+import br.com.fmu.sistemasdistribuidos.room.SenderMessages;
 
 public class Client {
 	
@@ -22,8 +22,8 @@ public class Client {
 		Socket client = new Socket(this.hostIP, this.port);
 		System.out.println("Conectando...");
 		
-		GameRoom room = new GameRoom(client.getInputStream());
-		new Thread(room).start();
+		SenderMessages sender = new SenderMessages(client.getInputStream());
+		new Thread(sender).start();
 		
 		Scanner scanner = new Scanner(System.in);
 		PrintStream out = new PrintStream(client.getOutputStream());

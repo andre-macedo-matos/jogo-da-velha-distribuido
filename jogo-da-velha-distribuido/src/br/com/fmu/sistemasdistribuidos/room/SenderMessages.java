@@ -3,11 +3,11 @@ package br.com.fmu.sistemasdistribuidos.room;
 import java.io.InputStream;
 import java.util.Scanner;
 
-public class GameRoom implements Runnable {
+public class SenderMessages implements Runnable {
 	
 	private InputStream server;
 	
-	public GameRoom(InputStream server) {
+	public SenderMessages(InputStream server) {
 		this.server = server;
 	}
 

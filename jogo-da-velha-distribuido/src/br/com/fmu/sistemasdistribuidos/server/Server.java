@@ -3,11 +3,10 @@ package br.com.fmu.sistemasdistribuidos.server;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.fmu.sistemasdistribuidos.room.MessagesCaster;
+import br.com.fmu.sistemasdistribuidos.player.Player;
 
 public class Server {
 	
@@ -24,18 +23,22 @@ public class Server {
 		System.out.println("Servidor online!!!");
 		
 		while (true) {
-			Socket client = server.accept();
-			System.out.println("Novo usuario conectado: " + client.getLocalPort());
+			Player playerOne = new Player('X', server.accept(), this);
+			Player playerTwo = new Player('O', server.accept(), this);
 			
-			PrintStream clientInput = new PrintStream(client.getOutputStream());
-			this.clients.add(clientInput);
+			playerOne.setOpponent(playerTwo);
+			playerTwo.setOpponent(playerOne);
 			
-			MessagesCaster messagesCast = new MessagesCaster(client.getInputStream(), this);
-			new Thread(messagesCast).start();
+			playerOne.start();
+			playerTwo.start();
+			
+			this.clients.add(playerOne.getOutput());
+			this.clients.add(playerTwo.getOutput());
 		}
 	}
 
 	public void castMessages(String message) {
+		System.out.println(message);
 		for (PrintStream client : clients) {
 			client.println(message);
 		}
