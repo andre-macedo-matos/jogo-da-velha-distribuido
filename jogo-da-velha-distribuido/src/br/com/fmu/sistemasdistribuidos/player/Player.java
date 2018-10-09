@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
-
-import br.com.fmu.sistemasdistribuidos.client.Client;
-import br.com.fmu.sistemasdistribuidos.server.Server;
 
 public class Player extends Thread {
 
@@ -17,12 +13,10 @@ public class Player extends Thread {
 	private Socket port;
 	private InputStream input;
 	private PrintStream output;
-	private Server server;
 
-	public Player(char mark, Socket port, Server server) {
+	public Player(char mark, Socket port) {
 		this.mark = mark;
 		this.port = port;
-		this.server = server;
 
 		try {
 			this.input = port.getInputStream();
@@ -42,7 +36,7 @@ public class Player extends Thread {
 
 			Scanner scanner = new Scanner(this.input);
 			while (scanner.hasNext()) {
-				server.castMessages(scanner.nextLine());
+				this.opponent.output.println(this.mark + ": " + scanner.nextLine());
 			}
 
 		} finally {
@@ -62,17 +56,6 @@ public class Player extends Thread {
 		try {
 			this.port.close();
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void main(String[] args) {
-		try {
-			new Client("127.0.0.1", 12345).connect();
-
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

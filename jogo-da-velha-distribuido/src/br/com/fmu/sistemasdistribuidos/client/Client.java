@@ -29,24 +29,12 @@ public class Client {
 		PrintStream out = new PrintStream(client.getOutputStream());
 		
 		while(scanner.hasNextLine()) {
-			out.println("client " + client.getInetAddress().getHostAddress() + ": " + scanner.nextLine());
+			out.println(scanner.nextLine());
 		}
 		
 		out.close();
 		scanner.close();
 		client.close();
 	}
-	
-	public static void main(String[] args) {
-		try {
-			new Client("127.0.0.1", 12345).connect();
-				
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	
 }
